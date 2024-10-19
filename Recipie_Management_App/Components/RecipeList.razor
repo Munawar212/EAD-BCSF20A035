@@ -1,0 +1,66 @@
+﻿@page "/"
+@page "/recipes"
+@using Recipie_Management_App.Services
+@using Recipie_Management_App.Models
+@inject RecipeService RecipeService
+
+<h3>Recipe List</h3>
+
+<div class="form-group">
+    <label for="categoryFilter">Filter by Category:</label>
+    <select id="categoryFilter" class="form-control" @onchange="FilterByCategory">
+        <option value="">All</option>
+        <option value="Breakfast">Breakfast</option>
+        <option value="Lunch">Lunch</option>
+        <option value="Dinner">Dinner</option>
+    </select>
+</div>
+
+<RecipeSearch @onSearch="SearchRecipes" />
+
+@if (filteredRecipes != null && filteredRecipes.Any())
+{
+    <div class="recipe-list">
+        @foreach (var recipe in filteredRecipes)
+        {
+            <RecipeCard Recipe="recipe" OnDelete="DeleteRecipe" />
+        }
+    </div>
+}
+else
+{
+    <p>No recipes found.</p>
+}
+
+@code {
+    private List<Recipe> recipes = new();
+    private List<Recipe> filteredRecipes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        recipes = await RecipeService.GetAllRecipes();
+        filteredRecipes = recipes;
+    }
+
+    private void SearchRecipes(string searchTerm)
+    {
+        filteredRecipes = string.IsNullOrEmpty(searchTerm)
+            ? recipes
+            : recipes.Where(r => r.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    private async Task FilterByCategory(ChangeEventArgs e)
+    {
+        string selectedCategory = e.Value?.ToString();
+        filteredRecipes = string.IsNullOrEmpty(selectedCategory)
+            ? recipes
+            : await RecipeService.GetRecipesByCategory(selectedCategory);  // Call service to get filtered recipes
+    }
+
+    private async Task DeleteRecipe(Recipe recipe)
+    {
+        await RecipeService.DeleteRecipe(recipe.Id);
+        recipes.Remove(recipe);
+        filteredRecipes = recipes;
+    }
+}

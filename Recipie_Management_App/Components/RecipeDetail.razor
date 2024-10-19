@@ -1,0 +1,36 @@
+﻿@page "/recipes/detail/{id:int}"
+@inject RecipeService RecipeService
+@inject NavigationManager NavigationManager
+
+<h3>Recipe Details</h3>
+
+@if (recipe != null)
+{
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">@recipe.Name</h5>
+            <p class="card-text">Ingredients: @recipe.Ingredients</p>
+            <p class="card-text">Instructions: @recipe.Instructions</p>
+            <button class="btn btn-primary" @onclick="NavigateBack">Back</button>
+        </div>
+    </div>
+}
+else
+{
+    <p>Loading recipe details...</p>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Recipe recipe;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        recipe = await RecipeService.GetRecipeById(Id);  // Fetch the recipe by ID
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/recipes");  // Navigate back to the recipe list
+    }
+}
