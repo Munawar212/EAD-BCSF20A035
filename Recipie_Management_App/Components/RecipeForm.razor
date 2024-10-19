@@ -1,0 +1,52 @@
+﻿@page "/recipes/new"
+@using Recipie_Management_App.Models
+@inject RecipeService RecipeService
+@inject NavigationManager NavigationManager
+
+<h3>Add New Recipe</h3>
+
+<EditForm Model="newRecipe" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="recipeName">Recipe Name:</label>
+        <InputText id="recipeName" @bind-Value="newRecipe.Name" class="form-control" />
+        <ValidationMessage For="@(() => newRecipe.Name)" />
+    </div>
+
+    <div class="form-group">
+        <label for="ingredients">Ingredients:</label>
+        <InputTextArea id="ingredients" @bind-Value="newRecipe.Ingredients" class="form-control" />
+        <ValidationMessage For="@(() => newRecipe.Ingredients)" />
+    </div>
+
+    <div class="form-group">
+        <label for="instructions">Instructions:</label>
+        <InputTextArea id="instructions" @bind-Value="newRecipe.Instructions" class="form-control" />
+        <ValidationMessage For="@(() => newRecipe.Instructions)" />
+    </div>
+
+    <div class="form-group">
+        <label for="category">Category:</label>
+        <select id="category" @bind="newRecipe.Category" class="form-control">
+            <option value="">Select Category</option>
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Dinner">Dinner</option>
+        </select>
+        <ValidationMessage For="@(() => newRecipe.Category)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Recipe</button>
+</EditForm>
+
+@code {
+    private Recipe newRecipe = new();
+
+    private async Task HandleValidSubmit()
+    {
+        await RecipeService.AddRecipe(newRecipe);
+        NavigationManager.NavigateTo("/recipes"); // Navigate back to the recipe list
+    }
+}

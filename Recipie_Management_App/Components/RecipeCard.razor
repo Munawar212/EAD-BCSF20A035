@@ -1,0 +1,22 @@
+﻿@using Recipie_Management_App.Models
+@using Microsoft.AspNetCore.Components.Routing
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">@Recipe.Name</h5>
+        <p class="card-text">@Recipe.Ingredients</p>
+
+        <button class="btn btn-danger" @onclick="DeleteRecipe">Delete</button>
+        <NavLink class="btn btn-info" href="@($"/recipes/detail/{Recipe.Id}")">View Details</NavLink>  <!-- Button to navigate to details -->
+    </div>
+</div>
+
+@code {
+    [Parameter] public Recipe Recipe { get; set; }
+    [Parameter] public EventCallback<Recipe> OnDelete { get; set; }
+
+    private async Task DeleteRecipe()
+    {
+        await OnDelete.InvokeAsync(Recipe);
+    }
+}
